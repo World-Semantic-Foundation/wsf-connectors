@@ -1,4 +1,4 @@
-# WSF Connectors — Integration Adapters
+# WSF Connectors : Integration Adapters
 
 > **Governed semantic interfaces for integration with downstream and external systems.**
 
@@ -109,7 +109,7 @@ Semantic Services
 
 ## Status
 
-This repository is being established per CR-WSF-17 Rev.1. Connector implementations await subsequent ADRs (ADR-WSF-25 — WSF Integration Architecture).
+This repository is being established per CR-WSF-17 Rev.1. Connector implementations await subsequent ADRs (ADR-WSF-25 ; WSF Integration Architecture).
 
 **No connector code has been written yet.**
 
@@ -117,10 +117,10 @@ This repository is being established per CR-WSF-17 Rev.1. Connector implementati
 
 ## Related Repositories
 
-- [wsf/](../wsf/) — Canonical semantic assets
-- [wsf-spec/](../wsf-spec/) — Normative specifications
-- [wsf-software/](../wsf-software/) — Engine implementation
-- [wsf-governance/](../wsf-governance/) — ADRs, CRs
+- [wsf/](../wsf/) : Canonical semantic assets
+- [wsf-spec/](../wsf-spec/) : Normative specifications
+- [wsf-software/](../wsf-software/) : Engine implementation
+- [wsf-governance/](../wsf-governance/) : ADRs, CRs
 
 ---
 
