@@ -1,127 +1,147 @@
-# WSF Connectors : Integration Adapters
+# wsf-connectors : WSF Connector Adapters
 
-> **Governed semantic interfaces for integration with downstream and external systems.**
+> **Federation and integration adapters for the World Semantic Foundation.**
+>
+> Implements ADR-WSF-25 (Integration Architecture) §4 (Connector Pattern).
 
-This repository (`wsf-connectors/`) contains the integration adapters and semantic mappings that connect WSF to other systems.
+## Overview
 
----
+WSF Connectors provide the bridge between the WSF Semantic Engine and external semantic ecosystems. Per ADR-WSF-25, three connector patterns are supported:
 
-## Repository Structure
+- **Read connectors** : Ingest external semantic data into WSF
+- **Write connectors** : Publish WSF concepts to external systems
+- **Bidirectional connectors** : Two-way federation with peer WSF nodes
 
-```
-wsf-connectors/
-├── README.md (this file)
-├── openDEA/                  ← OpenDEA Enterprise Architecture integration
-├── knowledge-graph/         ← Knowledge graph platform integrations
-├── data-platforms/          ← Data platform integrations
-├── modeling-tools/          ← Modeling tool integrations
-├── digital-twin-platforms/  ← Digital twin platform integrations
-└── ai-agents/               ← AI/Agent platform integrations
-```
+## Built-in Adapters
 
----
+### OpenDEA Connector (`adapters/opendea/`)
 
-## Integration Architecture (per CR-WSF-17 Rev.1 §10)
+Bidirectional connector for the OpenDEA (Open Digital Enterprise Architecture) ecosystem.
 
-WSF SHALL integrate with both specialized and mainstream platforms:
+**Mappings** :
+- OpenDEA Capability : wsf:Capability
+- OpenDEA Assessment : wsf:Assertion
+- OpenDEA Maturity Level : wsf:Measure
+- OpenDEA Architecture Model : wsf:Concept
 
-```
-WSF
- │
- ├── OpenDEA                  (Enterprise Architecture specialization)
- ├── Enterprise Architecture Platforms
- ├── Knowledge Graph Platforms
- ├── Data Platforms
- ├── Modeling Tools
- ├── Digital Twin Platforms
- ├── Simulation Systems
- ├── AI/Agent Platforms
- └── Mainstream Enterprise Platforms
-```
+### Schema.org Connector (`adapters/schema-org/`)
 
-**Integration occurs through governed semantic interfaces rather than uncontrolled direct coupling.**
+Read connector for the Schema.org vocabulary.
 
----
+**Mappings** :
+- schema:Organization : wsf:Organisation
+- schema:Person : wsf:Actor
+- schema:Product : wsf:Resource
+- schema:Service : wsf:Service
+- schema:Event : wsf:Event
+- schema:Place : wsf:Space
 
-## Integration Principles
+### SKOS Connector (`adapters/skos/`)
 
-1. **Governed semantic interfaces**: All integration via WSF-defined APIs
-2. **Semantic Contract**: Downstream systems must preserve WSF semantics
-3. **Two-way conformance**: WSF can claim conformance to external systems; vice versa
-4. **Identity preservation**: Identity survives cross-system boundaries
-5. **Reference resolution**: References resolved through governed namespaces
-6. **Provenance tracking**: Cross-system provenance recorded
-7. **Trust assessment**: Trust evaluation extends across boundaries
+Bidirectional connector for SKOS (Simple Knowledge Organization System) vocabularies.
 
----
+**Mappings** :
+- skos:Concept : wsf:Concept
+- skos:ConceptScheme : wsf:Namespace
+- skos:prefLabel : wsf:preferred_name
+- skos:altLabel : wsf:aliases
+- skos:definition : wsf:definition
+- skos:broader : wsf:specialises
+- skos:narrower : wsf:generalises
+- skos:related : wsf:relates
 
-## OpenDEA Integration (per CR-WSF-17 Rev.1 §11)
+### TM Forum Connector (`adapters/tm-forum/`)
 
-```
-WSF (foundational semantics)
-   ↓
-OpenDEA (enterprise architecture specialization)
-   ↓
-Architecture Models
-```
+Read connector for TM Forum product catalog and business framework.
 
-**Pattern**:
-```
-WSF:Capability
-   ↓ specializes
-OpenDEA:BusinessCapability
-   ↓ asserted-by
-OTCHERE Inc
-```
+**Mappings** :
+- tmf:Product : wsf:Resource
+- tmf:Service : wsf:Service
+- tmf:Customer : wsf:Actor
+- tmf:Agreement : wsf:Rule
+- tmf:Party : wsf:Actor
+- tmf:Organization : wsf:Organisation
 
-OpenDEA remains an independently governed Enterprise Architecture system. WSF SHALL NOT absorb OpenDEA's enterprise architecture semantics.
+## Architecture
 
----
+All connectors implement the ConnectorAdapter interface:
 
-## Assessment-Models Boundary (per CR-WSF-17 Rev.1 §12)
-
-```
-Assessment-Models (maturity-model governance)
-   ↓
-Maturity Models
-   ↓
-OpenDEA Maturity Assessment (OpenDEA-specific instance)
+```typescript
+interface ConnectorAdapter {
+  id: string;
+  name: string;
+  version: string;
+  authority: string;
+  initialise(config: ConnectorConfig): Promise<void>;
+  healthCheck(): Promise<HealthStatus>;
+  shutdown(): Promise<void>;
+}
 ```
 
-**Assessment-Models remains independently governed.** WSF SHALL NOT become the assessment governance authority.
+Plus direction-specific interfaces:
+- `ReadConnector` : pullConcepts, pullAssertions, resolveExternal
+- `WriteConnector` : pushConcept, pushAssertion, pushConcepts, removeConcept
+- `BidirectionalConnector` : both, plus federate and sync
 
----
+## Adapter Registry
 
-## Connector Patterns
+Adapters are registered via `registerAdapter(id, factory)` and created via `createAdapter(id, config)`:
 
-Per CR-WSF-17 Rev.1 §7:
+```typescript
+import { createAdapter, listAdapters } from '@wsf/connectors';
 
+console.log(listAdapters());
+// ['opendea', 'schema-org', 'skos', 'tm-forum']
+
+const opendea = await createAdapter('opendea', {
+  endpoint: 'https://api.opendea.org/v1',
+  auth: { type: 'api_key', api_key: process.env.OPENDEA_API_KEY! },
+});
 ```
-Semantic Services
-   ├── Validation      ← conformance checking against WSF spec
-   ├── Resolution      ← identity/reference resolution across boundaries
-   ├── Query           ← semantic queries across systems
-   ├── Reasoning       ← cross-system semantic inference
-   └── Mapping         ← semantic mappings between systems
+
+## Federation Patterns
+
+Per ADR-WSF-25 §5, three federation architectures are supported:
+
+1. **Hub-and-Spoke** : Central WSF hub with multiple external connectors
+2. **Peer-to-Peer** : Direct federation between WSF nodes
+3. **Hierarchical** : Layered federation with regional and global hubs
+
+## Usage Example
+
+```typescript
+import { createAdapter } from '@wsf/connectors';
+import { SemanticEngine } from '@wsf/semantic-engine';
+
+const engine = new SemanticEngine();
+await engine.initialise();
+
+// Configure and start a Schema.org read connector
+const schema = await createAdapter('schema-org', {
+  endpoint: 'https://schema.org',
+});
+await schema.initialise({ endpoint: 'https://schema.org' });
+
+// Ingest Schema.org types as WSF concepts
+for await (const concept of schema.pullConcepts()) {
+  await engine.services.concept.create(concept);
+}
 ```
-
----
-
-## Status
-
-This repository is being established per CR-WSF-17 Rev.1. Connector implementations await subsequent ADRs (ADR-WSF-25 ; WSF Integration Architecture).
-
-**No connector code has been written yet.**
-
----
 
 ## Related Repositories
 
-- [wsf/](../wsf/) : Canonical semantic assets
-- [wsf-spec/](../wsf-spec/) : Normative specifications
-- [wsf-software/](../wsf-software/) : Engine implementation
-- [wsf-governance/](../wsf-governance/) : ADRs, CRs
+- [wsf-software/](../wsf-software/) : WSF Semantic Engine (consumer of connectors)
+- [wsf/](../wsf/) : Core WSF concept vocabulary
+- [wsf-governance/](../wsf-governance/) : ADRs including ADR-WSF-25
+
+## Architectural References
+
+- **ADR-WSF-25** : Integration Architecture (this implementation)
+
+## License
+
+Apache-2.0
 
 ---
 
-*Integration through governed semantic interfaces. The integration architecture SHALL be established through subsequent ADRs.*
+*The WSF Connector Adapters. Status: Baseline.*
