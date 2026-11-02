@@ -28,7 +28,7 @@ import type {
   CURIE,
   Namespace,
   Relationship,
-} from '../../../wsf-software/src/types/index.js';
+} from '@wsf/semantic-engine';
 
 const SKOS_NAMESPACE: Namespace = {
   prefix: 'skos',
@@ -133,4 +133,4 @@ registerAdapter('skos', async (config) => {
   return connector;
 });
 
-export { SKOSConnector, SKOS_NAMESPACE };
+export { SKOS_NAMESPACE };

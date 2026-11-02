@@ -13,7 +13,7 @@ import type {
   CURIE,
   Namespace,
   IdentifierResolutionResult,
-} from '../src/types/index.js';
+} from '@wsf/semantic-engine';
 
 // ============================================================================
 // Connector Adapter Interface

@@ -23,7 +23,7 @@ import type {
   Assertion,
   CURIE,
   Namespace,
-} from '../../../wsf-software/src/types/index.js';
+} from '@wsf/semantic-engine';
 
 const SCHEMA_ORG_MAPPINGS: Array<{ schema: string; wsf: string; tier: string }> = [
   { schema: 'Organization', wsf: 'Organisation', tier: 'Tier 3' },
@@ -110,4 +110,5 @@ registerAdapter('schema-org', async (config) => {
   return connector;
 });
 
-export { SchemaOrgConnector, SCHEMA_ORG_NAMESPACE, SCHEMA_ORG_MAPPINGS };
+
+export { SCHEMA_ORG_NAMESPACE, SCHEMA_ORG_MAPPINGS };

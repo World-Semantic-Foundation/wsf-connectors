@@ -26,7 +26,7 @@ import type {
   CURIE,
   Namespace,
   Provenance,
-} from '../../../wsf-software/src/types/index.js';
+} from '@wsf/semantic-engine';
 
 const OPENDEA_NAMESPACE: Namespace = {
   prefix: 'opendea',
@@ -112,5 +112,5 @@ registerAdapter('opendea', async (config) => {
   return connector;
 });
 
-export { OpenDEAConnector, OPENDEA_NAMESPACE };
+export { OPENDEA_NAMESPACE };
 export type { ConnectorConfig, ReadConnector, WriteConnector, BidirectionalConnector };

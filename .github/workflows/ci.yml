@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      # The connectors depend on the Semantic Engine via a sibling file: dependency
+      # (@wsf/semantic-engine). Check out both repos side by side and build the
+      # engine first so type resolution succeeds.
+      - uses: actions/checkout@v4
+        with:
+          path: wsf-connectors
+
+      - uses: actions/checkout@v4
+        with:
+          repository: World-Semantic-Foundation/wsf-software
+          path: wsf-software
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build Semantic Engine (sibling dependency)
+        working-directory: wsf-software
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Install connector dependencies
+        working-directory: wsf-connectors
+        run: npm install --no-audit --no-fund
+
+      - name: Lint (tsc --noEmit)
+        working-directory: wsf-connectors
+        run: npm run lint
+
+      - name: Build
+        working-directory: wsf-connectors
+        run: npm run build

@@ -23,7 +23,7 @@ import type {
   Assertion,
   CURIE,
   Namespace,
-} from '../../../wsf-software/src/types/index.js';
+} from '@wsf/semantic-engine';
 
 const TM_FORUM_MAPPINGS: Array<{ tmf: string; wsf: string; tier: string }> = [
   { tmf: 'Product', wsf: 'Resource', tier: 'Tier 3' },
@@ -107,4 +107,4 @@ registerAdapter('tm-forum', async (config) => {
   return connector;
 });
 
-export { TMForumConnector, TM_FORUM_NAMESPACE, TM_FORUM_MAPPINGS };
+export { TM_FORUM_NAMESPACE, TM_FORUM_MAPPINGS };
