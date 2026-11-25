@@ -13,9 +13,18 @@
   },
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "tsc -p tsconfig.tests.json && node --test dist-tests/tests/*.test.js"
   },
-  "keywords": ["wsf", "connectors", "federation", "opendea", "schema-org", "skos", "tm-forum"],
+  "keywords": [
+    "wsf",
+    "connectors",
+    "federation",
+    "opendea",
+    "schema-org",
+    "skos",
+    "tm-forum"
+  ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -25,6 +34,7 @@
     "@wsf/semantic-engine": "file:../wsf-software"
   },
   "devDependencies": {
+    "@types/node": "^26.6.7",
     "typescript": "^5.4.0"
   }
 }
